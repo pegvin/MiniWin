@@ -1,10 +1,14 @@
 CC:=gcc
+AR:=ar
 CFLAGS:=-Isrc/ -std=c99 -Wall -MMD -MP
 LFLAGS:=
 
 BUILD      := build
 BUILD_TYPE := Debug
-BIN        := $(BUILD)/miniwin
+LIB        := $(BUILD)/miniwin.a
+
+EXAMPLE_SRC := src/example.c
+EXAMPLE_BIN := $(BUILD)/miniwin_example
 
 SOURCES := src/miniwin.c
 OBJECTS := $(SOURCES:.c=.c.o)
@@ -32,7 +36,19 @@ $(error Unknown Build Type "$(BUILD_TYPE)")
 	endif
 endif
 
-all: $(BIN)
+ifeq ($(OS),Windows_NT)
+	CFLAGS += -DMWIN_BACKEND_WIN32
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		CFLAGS += -DMWIN_BACKEND_X11=1
+	endif
+	ifeq ($(UNAME_S),Darwin)
+		CFLAGS += -DMWIN_BACKEND_COCOA=1
+	endif
+endif
+
+all: $(LIB) $(EXAMPLE_BIN)
 
 -include $(DEPENDS)
 
@@ -41,16 +57,20 @@ $(BUILD)/%.c.o: %.c
 	@mkdir -p "$$(dirname "$@")"
 	@$(BEAR) $(CC) $(CFLAGS) -c $< -o $@
 
-$(BIN): $(OBJECTS)
+$(LIB): $(OBJECTS)
+	@echo "AR -" $@
+	@$(AR) rcs $@ $<
+
+$(EXAMPLE_BIN): $(LIB)
 	@echo "LD -" $@
-	@$(CC) $(OBJECTS) $(LFLAGS) -o $@
+	@$(CC) $(EXAMPLE_SRC) $< -o $@
 
 .PHONY: run
 .PHONY: clean
 
 run: all
-	@./$(BIN)
+	@./$(EXAMPLE_BIN)
 
 clean:
-	@$(RM) -rv $(BIN) $(BUILD)
+	@$(RM) -rv $(EXAMPLE_BIN) $(LIB) $(BUILD)
 
