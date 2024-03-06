@@ -4,6 +4,7 @@
 int main(void) {
 	uint32_t fb[320 * 240] = {};
 	struct MiniWin win = {
+		.title = "HEllo",
 		.width = 320,
 		.height = 240,
 		.frameBuf = fb
@@ -14,7 +15,9 @@ int main(void) {
 		return 1;
 	}
 
-	// while (1) {}
+	while (mwin_poll(&win)) {
+		printf("%d,%d\n", win.mX, win.mY);
+	}
 
 	mwin_destroy(&win);
 

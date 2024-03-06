@@ -1,7 +1,7 @@
 CC:=gcc
 AR:=ar
 CFLAGS:=-Isrc/ -std=c99 -Wall -MMD -MP
-LFLAGS:=
+LFLAGS:=-lX11
 
 BUILD      := build
 BUILD_TYPE := Debug
@@ -61,7 +61,7 @@ $(LIB): $(OBJECTS)
 	@echo "AR -" $@
 	@$(AR) rcs $@ $<
 
-$(EXAMPLE_BIN): $(LIB)
+$(EXAMPLE_BIN): $(LIB) $(EXAMPLE_SRC)
 	@echo "LD -" $@
 	@$(CC) $(EXAMPLE_SRC) $< -o $@ $(LFLAGS)
 
