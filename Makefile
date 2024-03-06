@@ -63,7 +63,7 @@ $(LIB): $(OBJECTS)
 
 $(EXAMPLE_BIN): $(LIB)
 	@echo "LD -" $@
-	@$(CC) $(EXAMPLE_SRC) $< -o $@
+	@$(CC) $(EXAMPLE_SRC) $< -o $@ $(LFLAGS)
 
 .PHONY: run
 .PHONY: clean
