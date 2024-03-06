@@ -1,0 +1,46 @@
+name: ci
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install X (Linux)
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install xorg-dev -y
+
+    - name: Install Mingw64 (Windows)
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        choco install make mingw
+
+    - name: Build (Non-Windows)
+      if: ${{ matrix.os != 'windows-latest' }}
+      run: |
+        make all BUILD_TYPE=Release -j4
+
+    - name: Build (Windows)
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        mingw32-make all BUILD_TYPE=Release -j4
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }}
+        if-no-files-found: error
+        path: ./build/
+
