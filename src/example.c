@@ -6,9 +6,9 @@
 
 int main(void) {
 	struct MiniWin win = {
-		.title = "HEllo",
+		.title = "Hello",
 		.width = 320,
-		.height = 240,
+		.height = 240
 	};
 
 	if (!mwin_init(&win)) {
@@ -58,7 +58,7 @@ int main(void) {
 		}
 
 		for (uint32_t i = 0; i < win.width * win.height; i++) {
-			win.frameBuf[i] = rand();
+			win.pixels[i] = rand();
 		}
 		mwin_swap(&win);
 	}

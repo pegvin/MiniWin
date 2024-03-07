@@ -8,8 +8,8 @@ struct MiniWin {
 	const char* title;
 	int width;
 	int height;
-	uint32_t* frameBuf;
 
+	uint32_t* pixels;  // MiniWin Handles the allocation/resizing/freeing of the pixel buffer, you just need to write to it
 	void* backendData; // Backend Specific Data, To be ONLY touched by MiniWin functions
 };
 
