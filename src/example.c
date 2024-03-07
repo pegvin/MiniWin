@@ -45,10 +45,10 @@ int main(void) {
 		return 1;
 	}
 
-	char text[128] = "";
+	char text[128] = "INITIALIZING...";
 
 	bool isRunning = true;
-	bool doReDraw = false;
+	bool doReDraw = true;
 	while (isRunning) {
 		MW_Event evt = {0};
 		while (mwin_poll(&win, &evt)) {
