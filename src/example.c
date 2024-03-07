@@ -5,12 +5,10 @@
 #include "miniwin.h"
 
 int main(void) {
-	uint32_t fb[320 * 240] = {};
 	struct MiniWin win = {
 		.title = "HEllo",
 		.width = 320,
 		.height = 240,
-		.frameBuf = fb
 	};
 
 	if (!mwin_init(&win)) {
@@ -45,6 +43,10 @@ int main(void) {
 						evt.button.verb == MW_PRESS ? "MOUSE DOWN" : "MOUSE UP",
 						evt.button.btn == MW_MOUSE_LEFT ? "Left" : (evt.button.btn == MW_MOUSE_RIGHT ? "Right" : "Middle")
 					);
+					break;
+				}
+				case MW_EVENT_WINDOW_RESIZE: {
+					printf("[WINDOW RESIZE] %dx%d\n", evt.resize.width, evt.resize.height);
 					break;
 				}
 				case MW_EVENT_WINDOW_CLOSE: {

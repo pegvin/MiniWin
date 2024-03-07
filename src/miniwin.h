@@ -6,8 +6,8 @@
 
 struct MiniWin {
 	const char* title;
-	const int width;
-	const int height;
+	int width;
+	int height;
 	uint32_t* frameBuf;
 
 	void* backendData; // Backend Specific Data, To be ONLY touched by MiniWin functions
@@ -32,6 +32,7 @@ typedef enum {
 	MW_EVENT_MOUSE_MOTION,
 	MW_EVENT_MOUSE_BUTTON,
 
+	MW_EVENT_WINDOW_RESIZE,
 	MW_EVENT_WINDOW_CLOSE
 } MW_EventType;
 
@@ -59,11 +60,17 @@ typedef struct {
 	MW_MouseButton btn;
 } MW_EventMouseButton;
 
+typedef struct {
+	MW_EventType type;
+	int width, height;
+} MW_EventWindowResize;
+
 typedef union {
 	MW_EventType type;
 	MW_EventKeyboard key;
 	MW_EventMouseMotion motion;
 	MW_EventMouseButton button;
+	MW_EventWindowResize resize;
 } MW_Event;
 
 // Returns '1' on success
