@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "miniwin.h"
 
@@ -52,6 +53,10 @@ int main(void) {
 				}
 				case MW_EVENT_NONE: break;
 			}
+		}
+
+		for (uint32_t i = 0; i < win.width * win.height; i++) {
+			win.frameBuf[i] = rand();
 		}
 		mwin_swap(&win);
 	}
