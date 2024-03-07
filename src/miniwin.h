@@ -14,13 +14,6 @@ struct MiniWin {
 };
 
 typedef enum {
-	MW_KEYMOD_CTRL = 1,
-	MW_KEYMOD_SHIFT = 2,
-	MW_KEYMOD_ALT = 4,
-	MW_KEYMOD_META = 8
-} MW_KeyMod;
-
-typedef enum {
 	MW_PRESS,
 	MW_RELEASE
 } MW_Verb;
@@ -41,6 +34,20 @@ typedef enum {
 	MW_MOUSE_MIDDLE,
 	MW_MOUSE_RIGHT
 } MW_MouseButton;
+
+typedef enum {
+	MW_KEYMOD_NONE        = 0x0000,
+
+	MW_KEYMOD_SHIFT       = 0x0001,
+	MW_KEYMOD_CTRL        = 0x0002,
+	MW_KEYMOD_ALT         = 0x0004,
+	MW_KEYMOD_SUPER       = 0x0008, // "Windows Key"
+	MW_KEYMOD_CAPS_LOCK   = 0x0010,
+	MW_KEYMOD_NUM_LOCK    = 0x0020,
+	MW_KEYMOD_SCROLL_LOCK = 0x0040,
+
+	MW_KEYMOD_COUNT
+} MW_KeyMod;
 
 typedef enum {
 	MW_KEY_a = 'a',

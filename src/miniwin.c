@@ -191,10 +191,18 @@ int mwin_poll(struct MiniWin* win, MW_Event* evt) {
 		case KeyRelease: {
 			evt->type = MW_EVENT_KEYBOARD_KEY;
 			evt->key.verb = ev.type == KeyPress ? MW_PRESS : MW_RELEASE;
-			int m = ev.xkey.state;
-			int k = XkbKeycodeToKeysym(data->display, ev.xkey.keycode, 0, 0);
-			evt->key.key = XKeySym_To_MWKey(k);
-			evt->key.mod = (!!(m & ControlMask)) | (!!(m & ShiftMask) << 1) | (!!(m & Mod1Mask) << 2) | (!!(m & Mod4Mask) << 3);
+			int mod = ev.xkey.state;
+			int key = XkbKeycodeToKeysym(data->display, ev.xkey.keycode, 0, 0);
+			evt->key.key = XKeySym_To_MWKey(key);
+
+			evt->key.mod = MW_KEYMOD_NONE;
+			if (mod & ShiftMask)   evt->key.mod |= MW_KEYMOD_SHIFT;
+			if (mod & ControlMask) evt->key.mod |= MW_KEYMOD_CTRL;
+			if (mod & LockMask)    evt->key.mod |= MW_KEYMOD_CAPS_LOCK;
+			if (mod & Mod1Mask)    evt->key.mod |= MW_KEYMOD_ALT;
+			if (mod & Mod2Mask)    evt->key.mod |= MW_KEYMOD_NUM_LOCK;
+			if (mod & Mod3Mask)    evt->key.mod |= MW_KEYMOD_SCROLL_LOCK;
+			if (mod & Mod4Mask)    evt->key.mod |= MW_KEYMOD_SUPER;
 			break;
 		}
 		case ConfigureNotify: {
