@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdbool.h>
+
 #include "miniwin.h"
 
 int main(void) {
@@ -15,8 +17,42 @@ int main(void) {
 		return 1;
 	}
 
-	while (mwin_poll(&win)) {
-		printf("%d,%d\n", win.mX, win.mY);
+	bool isRunning = true;
+	while (isRunning) {
+		MW_Event evt = {0};
+		while (mwin_poll(&win, &evt)) {
+			switch (evt.type) {
+				case MW_EVENT_KEYBOARD_KEY: {
+					printf(
+						"[%s] '%c'\n",
+						evt.key.verb == MW_PRESS ? "KEY DOWN" : "KEY UP",
+						evt.key.key
+					);
+					break;
+				}
+				case MW_EVENT_MOUSE_MOTION: {
+					printf(
+						"[MOUSE MOVE] %d,%d\n",
+						evt.motion.x,
+						evt.motion.y
+					);
+					break;
+				}
+				case MW_EVENT_MOUSE_BUTTON: {
+					printf(
+						"[%s] %s\n",
+						evt.button.verb == MW_PRESS ? "MOUSE DOWN" : "MOUSE UP",
+						evt.button.btn == MW_MOUSE_LEFT ? "Left" : (evt.button.btn == MW_MOUSE_RIGHT ? "Right" : "Middle")
+					);
+					break;
+				}
+				case MW_EVENT_WINDOW_CLOSE: {
+					isRunning = false;
+					break;
+				}
+				case MW_EVENT_NONE: break;
+			}
+		}
 		mwin_swap(&win);
 	}
 

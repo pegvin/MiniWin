@@ -12,6 +12,7 @@ struct BackEndData {
 	Window   xWin;
 	GC       gCtx;
 	XImage*  img;
+	Atom     wmDelete;
 };
 
 int mwin_init(struct MiniWin* win) {
@@ -38,6 +39,9 @@ int mwin_init(struct MiniWin* win) {
 		24, ZPixmap, 0, (char *)win->frameBuf, win->width, win->height, 32, 0
 	);
 
+	data->wmDelete = XInternAtom(data->display, "WM_DELETE_WINDOW", False);
+	XSetWMProtocols(data->display, data->xWin, &data->wmDelete, 1);
+
 	win->backendData = data;
 
 	return 1;
@@ -60,40 +64,72 @@ void mwin_swap(const struct MiniWin* win) {
 	XFlush(data->display);
 }
 
-int mwin_poll(struct MiniWin* win) {
+int mwin_poll(struct MiniWin* win, MW_Event* evt) {
 	struct BackEndData* data = (struct BackEndData*)win->backendData;
 
+	int pending = XPending(data->display);
+	if (pending < 1) {
+		return 0;
+	}
+
 	XEvent ev;
-	while (XPending(data->display)) {
-		XNextEvent(data->display, &ev);
-		switch (ev.type) {
-			case ButtonPress:
-			case ButtonRelease: {
-				win->isLmbDown = (ev.type == ButtonPress);
+	XNextEvent(data->display, &ev);
+	switch (ev.type) {
+		case ButtonPress:
+		case ButtonRelease: {
+			if (ev.xbutton.button > Button3) {
 				break;
 			}
-			case MotionNotify: {
-				win->mX = ev.xmotion.x;
-				win->mY = ev.xmotion.y;
-				break;
-			}
-			case KeyPress:
-			case KeyRelease: {
-				int m = ev.xkey.state;
-				int k = XkbKeycodeToKeysym(data->display, ev.xkey.keycode, 0, 0);
-				for (unsigned int i = 0; i < 124; i += 2) {
-					if (KEYCODES_G[i] == k) {
-						win->keys[KEYCODES_G[i + 1]] = (ev.type == KeyPress);
-						break;
-					}
+
+			evt->type =	MW_EVENT_MOUSE_BUTTON;
+			// http://xahlee.info/linux/linux_x11_mouse_button_number.html
+			switch (ev.xbutton.button) {
+				case Button1: {
+					evt->button.btn = MW_MOUSE_LEFT;
+					break;
 				}
-				win->mod = (!!(m & ControlMask)) | (!!(m & ShiftMask) << 1) | (!!(m & Mod1Mask) << 2) | (!!(m & Mod4Mask) << 3);
-				break;
+				case Button2: {
+					evt->button.btn = MW_MOUSE_MIDDLE;
+					break;
+				}
+				case Button3: {
+					evt->button.btn = MW_MOUSE_RIGHT;
+					break;
+				}
 			}
+			evt->button.verb = ev.type == ButtonPress ? MW_PRESS : MW_RELEASE;
+			break;
+		}
+		case MotionNotify: {
+			evt->type = MW_EVENT_MOUSE_MOTION;
+			evt->motion.x = ev.xmotion.x;
+			evt->motion.y = ev.xmotion.y;
+			break;
+		}
+		case KeyPress:
+		case KeyRelease: {
+			evt->type = MW_EVENT_KEYBOARD_KEY;
+			evt->key.verb = ev.type == KeyPress ? MW_PRESS : MW_RELEASE;
+			int m = ev.xkey.state;
+			int k = XkbKeycodeToKeysym(data->display, ev.xkey.keycode, 0, 0);
+			for (unsigned int i = 0; i < 124; i += 2) {
+				if (KEYCODES_G[i] == k) {
+					evt->key.key = KEYCODES_G[i + 1];
+					break;
+				}
+			}
+			evt->key.mod = (!!(m & ControlMask)) | (!!(m & ShiftMask) << 1) | (!!(m & Mod1Mask) << 2) | (!!(m & Mod4Mask) << 3);
+			break;
+		}
+		case ClientMessage: {
+			if (ev.xclient.data.l[0] == data->wmDelete) {
+				evt->type = MW_EVENT_WINDOW_CLOSE;
+			}
+			break;
 		}
 	}
 
-	return 1;
+	return pending;
 }
 
 #else
