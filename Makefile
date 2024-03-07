@@ -1,14 +1,15 @@
-CC:=gcc
-AR:=ar
-CFLAGS:=-Isrc/ -std=c99 -Wall -MMD -MP
-LFLAGS:=-lX11
+CC = gcc
+AR = ar
+MKDIR = mkdir -p
+CFLAGS = -Isrc/ -std=c99 -Wall -MMD -MP
+LFLAGS =
 
-BUILD      := build
-BUILD_TYPE := Debug
-LIB        := $(BUILD)/miniwin.a
+BUILD      = build
+BUILD_TYPE = Debug
+LIB        = $(BUILD)/miniwin.a
 
-EXAMPLE_SRC := src/example.c
-EXAMPLE_BIN := $(BUILD)/miniwin_example
+EXAMPLE_SRC = src/example.c
+EXAMPLE_BIN = $(BUILD)/miniwin_example
 
 SOURCES := src/miniwin.c
 OBJECTS := $(SOURCES:.c=.c.o)
@@ -22,8 +23,10 @@ DEPENDS := $(OBJECTS:.o=.d)
 # Note: Using multiple jobs with bear is not supported, i.e.
 #       `make all -j4` won't work with bear enabled
 BEAR :=
-ifneq (, $(shell which bear))
-	BEAR:=bear --append --output $(BUILD)/compile_commands.json --
+ifneq ($(OS),Windows_NT)
+	ifneq (, $(shell which bear))
+		BEAR:=bear --append --output $(BUILD)/compile_commands.json --
+	endif
 endif
 
 ifeq ($(BUILD_TYPE),Debug)
@@ -38,10 +41,13 @@ endif
 
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -DMWIN_BACKEND_WIN32
+	LFLAGS += -lgdi32
+	MKDIR = mkdir
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
 		CFLAGS += -DMWIN_BACKEND_X11=1
+		LFLAGS += -lX11
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS += -DMWIN_BACKEND_COCOA=1
@@ -52,9 +58,11 @@ all: $(LIB) $(EXAMPLE_BIN)
 
 -include $(DEPENDS)
 
+$(BUILD)/%:
+	@$(MKDIR) "$(dir $@)"
+
 $(BUILD)/%.c.o: %.c
 	@echo "CC -" $<
-	@mkdir -p "$$(dirname "$@")"
 	@$(BEAR) $(CC) $(CFLAGS) -c $< -o $@
 
 $(LIB): $(OBJECTS)
