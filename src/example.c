@@ -17,6 +17,7 @@ int main(void) {
 
 	while (mwin_poll(&win)) {
 		printf("%d,%d\n", win.mX, win.mY);
+		mwin_swap(&win);
 	}
 
 	mwin_destroy(&win);

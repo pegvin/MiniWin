@@ -21,6 +21,7 @@ struct MiniWin {
 // Returns '1' on success
 int mwin_init(struct MiniWin* win);
 int mwin_poll(struct MiniWin* win);
+void mwin_swap(const struct MiniWin* win);
 
 void mwin_destroy(struct MiniWin* win);
 
