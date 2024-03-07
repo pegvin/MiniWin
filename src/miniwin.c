@@ -62,7 +62,79 @@ void mwin_destroy(struct MiniWin* win) {
 	win->pixels = NULL;
 }
 
-static int KEYCODES_G[124] = {XK_BackSpace,8,XK_Delete,127,XK_Down,18,XK_End,5,XK_Escape,27,XK_Home,2,XK_Insert,26,XK_Left,20,XK_Page_Down,4,XK_Page_Up,3,XK_Return,10,XK_Right,19,XK_Tab,9,XK_Up,17,XK_apostrophe,39,XK_backslash,92,XK_bracketleft,91,XK_bracketright,93,XK_comma,44,XK_equal,61,XK_grave,96,XK_minus,45,XK_period,46,XK_semicolon,59,XK_slash,47,XK_space,32,XK_a,65,XK_b,66,XK_c,67,XK_d,68,XK_e,69,XK_f,70,XK_g,71,XK_h,72,XK_i,73,XK_j,74,XK_k,75,XK_l,76,XK_m,77,XK_n,78,XK_o,79,XK_p,80,XK_q,81,XK_r,82,XK_s,83,XK_t,84,XK_u,85,XK_v,86,XK_w,87,XK_x,88,XK_y,89,XK_z,90,XK_0,48,XK_1,49,XK_2,50,XK_3,51,XK_4,52,XK_5,53,XK_6,54,XK_7,55,XK_8,56,XK_9,57};
+static inline MW_KeyboardKey XKeySym_To_MWKey(KeySym k) {
+	switch (k) {
+	case XK_a: return MW_KEY_a;
+	case XK_b: return MW_KEY_b;
+	case XK_c: return MW_KEY_c;
+	case XK_d: return MW_KEY_d;
+	case XK_e: return MW_KEY_e;
+	case XK_f: return MW_KEY_f;
+	case XK_g: return MW_KEY_g;
+	case XK_h: return MW_KEY_h;
+	case XK_i: return MW_KEY_i;
+	case XK_j: return MW_KEY_j;
+	case XK_k: return MW_KEY_k;
+	case XK_l: return MW_KEY_l;
+	case XK_m: return MW_KEY_m;
+	case XK_n: return MW_KEY_n;
+	case XK_o: return MW_KEY_o;
+	case XK_p: return MW_KEY_p;
+	case XK_q: return MW_KEY_q;
+	case XK_r: return MW_KEY_r;
+	case XK_s: return MW_KEY_s;
+	case XK_t: return MW_KEY_t;
+	case XK_u: return MW_KEY_u;
+	case XK_v: return MW_KEY_v;
+	case XK_w: return MW_KEY_w;
+	case XK_x: return MW_KEY_x;
+	case XK_y: return MW_KEY_y;
+	case XK_z: return MW_KEY_z;
+
+	case XK_0: return MW_KEY_0;
+	case XK_1: return MW_KEY_1;
+	case XK_2: return MW_KEY_2;
+	case XK_3: return MW_KEY_3;
+	case XK_4: return MW_KEY_4;
+	case XK_5: return MW_KEY_5;
+	case XK_6: return MW_KEY_6;
+	case XK_7: return MW_KEY_7;
+	case XK_8: return MW_KEY_8;
+	case XK_9: return MW_KEY_9;
+
+	case XK_space: return MW_KEY_SPACE;
+	case XK_apostrophe: return MW_KEY_APOSTROPHE;
+	case XK_grave: return MW_KEY_GRAVE_ACCENT;
+	case XK_comma: return MW_KEY_COMMA;
+	case XK_minus: return MW_KEY_MINUS;
+	case XK_period: return MW_KEY_PERIOD;
+	case XK_semicolon: return MW_KEY_SEMICOLON;
+	case XK_equal: return MW_KEY_EQUAL;
+
+	case XK_bracketleft: return MW_KEY_LEFT_BRACKET;
+	case XK_bracketright: return MW_KEY_RIGHT_BRACKET;
+
+	case XK_slash: return MW_KEY_SLASH;
+	case XK_backslash: return MW_KEY_BACKSLASH;
+
+	case XK_Escape: return MW_KEY_ESCAPE;
+	case XK_Return: return MW_KEY_ENTER;
+	case XK_Tab: return MW_KEY_TAB;
+	case XK_BackSpace: return MW_KEY_BACKSPACE;
+	case XK_Insert: return MW_KEY_INSERT;
+	case XK_Delete: return MW_KEY_DELETE;
+	case XK_Right: return MW_KEY_RIGHT;
+	case XK_Left: return MW_KEY_LEFT;
+	case XK_Down: return MW_KEY_DOWN;
+	case XK_Up: return MW_KEY_UP;
+	case XK_Page_Up: return MW_KEY_PAGE_UP;
+	case XK_Page_Down: return MW_KEY_PAGE_DOWN;
+	case XK_Home: return MW_KEY_HOME;
+	case XK_End: return MW_KEY_END;
+
+	default: return MW_KEY_UNKNOWN;
+	}
+}
 
 void mwin_swap(const struct MiniWin* win) {
 	struct BackEndData* data = (struct BackEndData*)win->backendData;
@@ -121,12 +193,7 @@ int mwin_poll(struct MiniWin* win, MW_Event* evt) {
 			evt->key.verb = ev.type == KeyPress ? MW_PRESS : MW_RELEASE;
 			int m = ev.xkey.state;
 			int k = XkbKeycodeToKeysym(data->display, ev.xkey.keycode, 0, 0);
-			for (unsigned int i = 0; i < 124; i += 2) {
-				if (KEYCODES_G[i] == k) {
-					evt->key.key = KEYCODES_G[i + 1];
-					break;
-				}
-			}
+			evt->key.key = XKeySym_To_MWKey(k);
 			evt->key.mod = (!!(m & ControlMask)) | (!!(m & ShiftMask) << 1) | (!!(m & Mod1Mask) << 2) | (!!(m & Mod4Mask) << 3);
 			break;
 		}
