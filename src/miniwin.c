@@ -7,6 +7,7 @@
 #include <X11/XKBlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
+#include <X11/Xatom.h>
 
 struct BackEndData {
 	Display* display;
@@ -35,6 +36,8 @@ int mwin_init(struct MiniWin* win) {
 	);
 	XStoreName(data->display, data->xWin, win->title);
 	XMapWindow(data->display, data->xWin);
+
+	// Synchronize to make sure all commands are processed
 	XSync(data->display, data->xWin);
 
 	win->pixels = calloc(win->width * win->height * sizeof(*win->pixels), 1);
@@ -45,6 +48,16 @@ int mwin_init(struct MiniWin* win) {
 
 	data->wmDelete = XInternAtom(data->display, "WM_DELETE_WINDOW", False);
 	XSetWMProtocols(data->display, data->xWin, &data->wmDelete, 1);
+
+	// Disable Compositor For This App
+	Atom NET_WM_BYPASS_COMPOSITOR = XInternAtom(data->display, "_NET_WM_BYPASS_COMPOSITOR", False);
+	const unsigned long value = 1;
+	XChangeProperty(
+		data->display, data->xWin,
+		NET_WM_BYPASS_COMPOSITOR,
+		XA_CARDINAL, 32, PropModeReplace,
+		(unsigned char*) &value, 1
+	);
 
 	win->backendData = data;
 
