@@ -12,7 +12,7 @@ a mini cross-platform window creation library in c99
 compiling this library is easy enough, just put [miniwin.c](./src/miniwin.c) & [miniwin.h](./src/miniwin.h)
 somewhere in your project and when compiling you can choose to specify what backend you want to use.  The library
 by default will check if `MWIN_BACKEND_*` is defined, if not it will use x11 if `__linux__` is defined or Win32
-if `_WIN32` is defined.
+if `_WIN32`/`_WIN64` is defined.
 
 | Backend |      Definition      | Linker Flags |
 |---------|----------------------|--------------|
