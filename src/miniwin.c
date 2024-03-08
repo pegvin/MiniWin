@@ -74,6 +74,9 @@ void mwin_destroy(struct MiniWin* win) {
 	XFreeGC(data->display, data->gCtx);
 	data->gCtx = NULL;
 
+	XUnmapWindow(data->display, data->xWin);
+	XDestroyWindow(data->display, data->xWin);
+
 	XCloseDisplay(data->display);
 	data->display = NULL;
 
