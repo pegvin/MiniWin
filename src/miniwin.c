@@ -271,7 +271,7 @@ typedef struct BINFO {
 	RGBQUAD             bmiColors[3];
 } BINFO;
 
-static LRESULT CALLBACK fenster_wndproc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+static LRESULT CALLBACK _MW_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_CLOSE: {
 			DestroyWindow(hwnd);
@@ -307,7 +307,7 @@ int mwin_init(struct MiniWin* win) {
 	WNDCLASSEX wc = {0};
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = CS_VREDRAW | CS_HREDRAW;
-	wc.lpfnWndProc = fenster_wndproc;
+	wc.lpfnWndProc = _MW_WndProc;
 	wc.hInstance = hInstance;
 	wc.lpszClassName = win->title;
 	RegisterClassEx(&wc);
