@@ -19,6 +19,11 @@ if `_WIN32`/`_WIN64` is defined.
 | Win32   | `MWIN_BACKEND_WIN32` | `-lgdi32`    |
 | X11     | `MWIN_BACKEND_X11`   | `-lX11`      |
 
+### API
+The API is pretty self-explanatory, except the Pixel buffer you will be writing into will be
+allocated, resized & deallocated by the library itself, you are just supposed to write into
+the Pixel buffer and call `mwin_swap(...)` to show the updated buffer onto the screen.
+
 ---
 
 ## Thanks
