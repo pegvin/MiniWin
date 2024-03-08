@@ -1,6 +1,9 @@
 # MiniWin
 a mini cross-platform window creation library in c99
 
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pegvin/miniwin/ci.yml)](#)
+[![GitHub License](https://img.shields.io/github/license/pegvin/miniwin)](./LICENSE)
+
 ---
 
 ### Backends
