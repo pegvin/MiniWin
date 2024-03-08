@@ -66,13 +66,19 @@ int mwin_init(struct MiniWin* win) {
 
 void mwin_destroy(struct MiniWin* win) {
 	struct BackEndData* data = (struct BackEndData*)win->backendData;
+
+	XDestroyImage(data->img);
+	data->img = NULL;
+	win->pixels = NULL;
+
+	XFreeGC(data->display, data->gCtx);
+	data->gCtx = NULL;
+
 	XCloseDisplay(data->display);
+	data->display = NULL;
 
 	free(win->backendData);
 	win->backendData = NULL;
-
-	free(win->pixels);
-	win->pixels = NULL;
 }
 
 static inline MW_KeyboardKey XKeySym_To_MWKey(KeySym k) {

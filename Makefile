@@ -31,6 +31,10 @@ endif
 
 ifeq ($(BUILD_TYPE),Debug)
 	CFLAGS+=-O0 -g
+	ifneq ($(OS),Windows_NT)
+		CFLAGS += -fsanitize=address,undefined
+		LFLAGS += -fsanitize=address,undefined
+	endif
 else
 	ifeq ($(BUILD_TYPE),Release)
 		CFLAGS+=-O3
