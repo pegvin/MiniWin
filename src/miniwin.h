@@ -156,11 +156,12 @@ typedef union {
 // Returns '1' on success
 int mwin_init(struct MiniWin* win);
 
-// Returns number of pending events
+// Returns 1 if more events are available, or 0 is no events are available
 int mwin_poll(struct MiniWin* win, MW_Event* evt);
 
 void mwin_swap(const struct MiniWin* win);
 
+// Must be called after MW_EVENT_WINDOW_CLOSE occurs
 void mwin_destroy(struct MiniWin* win);
 
 #endif // !MINIWIN_H_INCLUDED_
