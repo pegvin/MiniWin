@@ -1,7 +1,7 @@
 CC = gcc
 AR = ar
 MKDIR = mkdir -p
-CFLAGS = -Isrc/ -std=c99 -Wall -MMD -MP
+CFLAGS = -Isrc/ -std=c99 -MMD -MP -pedantic -Wall -Wextra
 LFLAGS =
 
 BUILD      = build

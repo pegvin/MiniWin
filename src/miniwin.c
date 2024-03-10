@@ -248,7 +248,7 @@ int mwin_poll(struct MiniWin* win, MW_Event* evt) {
 			break;
 		}
 		case ClientMessage: {
-			if (ev.xclient.data.l[0] == data->wmDelete) {
+			if ((Atom)ev.xclient.data.l[0] == data->wmDelete) {
 				evt->type = MW_EVENT_WINDOW_CLOSE;
 			}
 			break;
